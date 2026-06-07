@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuestra Historia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose:    #c0526a;
+    --rose-lt: #e8a0b0;
+    --rose-dk: #7d2e40;
+    --cream:   #fdf6f0;
+    --warm:    #f5e6d8;
+    --text:    #2a1a1e;
+    --muted:   #7a5c63;
+    --line:    rgba(192,82,106,.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 40px 24px;
+    background: var(--cream);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 20% 30%, rgba(192,82,106,.10) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 80% 70%, rgba(232,160,176,.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 20px;
+    animation: fadeUp .8s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 10vw, 96px);
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 8px;
+    animation: fadeUp .8s .15s ease both;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--rose);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-bottom: 48px;
+    animation: fadeUp .8s .3s ease both;
+  }
+
+  .hero-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--rose-lt);
+    font-size: 12px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    animation: fadeUp .8s .45s ease both;
+    cursor: pointer;
+  }
+
+  .hero-scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--rose-lt), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* decorative petals */
+  .petal {
+    position: absolute;
+    border-radius: 50% 0 50% 0;
+    opacity: .12;
+    pointer-events: none;
+  }
+  .petal-1 { width:180px;height:180px; background:var(--rose); top:-40px; right:10%; transform:rotate(25deg); }
+  .petal-2 { width:120px;height:120px; background:var(--rose-lt); bottom:10%; left:5%; transform:rotate(-15deg); }
+  .petal-3 { width:80px;height:80px; background:var(--rose-dk); top:30%; left:15%; transform:rotate(45deg); opacity:.07; }
+
+  /* ── TIMELINE SECTION ── */
+  .tl-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 80px 24px 120px;
+  }
+
+  .tl-section-label {
+    font-size: 11px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rose);
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .tl-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    text-align: center;
+    color: var(--text);
+    margin-bottom: 72px;
+    line-height: 1.2;
+  }
+
+  .tl-section-title em { font-style: italic; color: var(--rose); }
+
+  /* central line */
+  .timeline {
+    position: relative;
+    padding: 0 0 40px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--rose-lt) 8%, var(--rose-lt) 92%, transparent);
+    transform: translateX(-50%);
+  }
+
+  /* items alternating left/right */
+  .tl-item {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: calc(50% + 40px);
+    margin-bottom: 64px;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+
+  .tl-item:nth-child(even) {
+    justify-content: flex-start;
+    padding-right: 0;
+    padding-left: calc(50% + 40px);
+    transform: translateX(30px);
+  }
+
+  .tl-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* dot on line */
+  .tl-item::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 22px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--rose);
+    border: 3px solid var(--cream);
+    box-shadow: 0 0 0 1px var(--rose-lt);
+    transform: translateX(-50%);
+    transition: transform .3s ease;
+  }
+
+  .tl-item:hover::after { transform: translateX(-50%) scale(1.4); }
+
+  /* year badge */
+  .tl-year {
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    transform: translateX(-50%);
+    background: var(--rose);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 20px;
+  }
+
+  /* card */
+  .tl-card {
+    background: #fff;
+    border: 1px solid rgba(192,82,106,.12);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 320px;
+    width: 100%;
+    box-shadow: 0 4px 24px rgba(192,82,106,.06);
+    transition: box-shadow .3s ease, transform .3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tl-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--rose);
+    border-radius: 3px 0 0 3px;
+  }
+
+  .tl-item:nth-child(even) .tl-card::before {
+    left: auto; right: 0;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .tl-card:hover {
+    box-shadow: 0 8px 40px rgba(192,82,106,.14);
+    transform: translateY(-3px);
+  }
+
+  .tl-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--rose);
+    background: rgba(192,82,106,.08);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .tl-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .tl-card-body {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  /* photo placeholder */
+  .tl-photo {
+    width: 100%;
+    height: 140px;
+    background: var(--warm);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    border: 1.5px dashed rgba(192,82,106,.25);
+    transition: background .2s ease, border-color .2s ease;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tl-photo:hover { background: rgba(192,82,106,.08); border-color: var(--rose-lt); }
+  .tl-photo:hover .photo-overlay { opacity: 1; }
+
+  .photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(192,82,106,.06);
+    opacity: 0;
+    transition: opacity .2s;
+  }
+
+  .tl-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    position: absolute;
+    inset: 0;
+  }
+
+  .photo-icon {
+    font-size: 28px;
+    color: var(--rose-lt);
+    z-index: 1;
+  }
+
+  .photo-label {
+    font-size: 11px;
+    color: var(--rose-lt);
+    font-weight: 400;
+    z-index: 1;
+  }
+
+  /* message quote */
+  .tl-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--muted);
+    border-left: 2px solid var(--rose-lt);
+    padding-left: 12px;
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+
+  /* highlight card (anniversary) */
+  .tl-item.highlight .tl-card {
+    background: linear-gradient(135deg, #fff0f3 0%, #fff 60%);
+    border-color: rgba(192,82,106,.25);
+  }
+
+  .tl-item.highlight .tl-card::before { width: 4px; background: var(--rose-dk); }
+
+  .heart-badge {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
+  /* ── FOOTER ── */
+  .tl-footer {
+    text-align: center;
+    padding: 60px 24px 80px;
+  }
+
+  .tl-footer-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(24px, 5vw, 40px);
+    color: var(--rose-dk);
+    margin-bottom: 12px;
+  }
+
+  .tl-footer-sub {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .btn-gallery {
+    display: inline-block;
+    padding: 14px 36px;
+    background: var(--rose);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    border-radius: 50px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+    box-shadow: 0 4px 20px rgba(192,82,106,.3);
+  }
+
+  .btn-gallery:hover {
+    background: var(--rose-dk);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(192,82,106,.4);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: .5; transform: scaleY(1); }
+    50%       { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14%      { transform: scale(1.18); }
+    28%      { transform: scale(1); }
+    42%      { transform: scale(1.12); }
+    56%      { transform: scale(1); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .timeline::before { left: 20px; }
+
+    .tl-item,
+    .tl-item:nth-child(even) {
+      justify-content: flex-start;
+      padding-left: 52px;
+      padding-right: 0;
+      transform: translateX(20px);
+    }
+
+    .tl-item::after,
+    .tl-item:nth-child(even)::after {
+      left: 20px; right: auto;
+    }
+
+    .tl-year { left: 20px; transform: translateX(0); font-size: 9px; top: 18px; }
+
+    .tl-card { max-width: 100%; }
+    .tl-card::before,
+    .tl-item:nth-child(even) .tl-card::before { left: 0; right: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="petal petal-1"></div>
+  <div class="petal petal-2"></div>
+  <div class="petal petal-3"></div>
+
+  <p class="hero-eyebrow">Una historia de amor</p>
+  <h1 class="hero-title">Nuestra <em>historia</em></h1>
+  <p class="hero-sub">Cinco años, infinitos momentos.</p>
+
+  <div class="hero-scroll" onclick="document.querySelector('.tl-section').scrollIntoView({behavior:'smooth'})">
+    <div class="hero-scroll-line"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+
+<section class="tl-section">
+  <p class="tl-section-label">Desde el principio</p>
+  <h2 class="tl-section-title">Los momentos que <em>nos definen</em></h2>
+
+  <div class="timeline" id="timeline">
+
+    <article class="tl-item" data-year="Ene 2020">
+      <div class="tl-year">Ene 2020</div>
+      <div class="tl-card">
+        <span class="tl-tag">Primer encuentro</span>
+        <h3 class="tl-card-title">Cómo nos conocimos</h3>
+        <p class="tl-card-body">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus cumque perferendis libero consequuntur dignissimos veritatis quia, officia expedita maiores totam reprehenderit at nostrum consequatur soluta accusamus nam tenetur voluptates nisi.
+        </p>
+        <div class="tl-photo" title="Añadir foto">
+          <div class="photo-overlay"></div>
+           <img src="placeholder.jpg" alt="Primer encuentro">
+          <span class="photo-icon">📷</span>
+          <span class="photo-label">Añadir foto</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 2: Primera cita -->
+    <article class="tl-item" data-year="Mar 2020">
+      <div class="tl-year">Mar 2020</div>
+      <div class="tl-card">
+        <span class="tl-tag">Primera cita</span>
+        <h3 class="tl-card-title">La primera cita</h3>
+        <p class="tl-card-body">
+          El restaurante, la risa, los nervios. Una noche que empezó algo que no sabíamos cuánto iba a crecer.
+        </p>
+        <div class="tl-photo" title="Añadir foto">
+          <div class="photo-overlay"></div>
+           <img src="placeholder.jpg" alt="Primera cita">
+          <span class="photo-icon">🕯️</span>
+          <span class="photo-label">Añadir foto</span>
+        </div>
+        <blockquote class="tl-quote">
+          "Pon aquí algo que dijiste o escribiste esa noche."
+        </blockquote>
+      </div>
+    </article>
+
+    <!-- 3: Primer viaje -->
+    <article class="tl-item" data-year="Dic 2021">
+      <div class="tl-year">Dic 2021</div>
+      <div class="tl-card">
+        <span class="tl-tag">Primer viaje</span>
+        <h3 class="tl-card-title">Nuestro primer viaje</h3>
+        <p class="tl-card-body">
+          Aventurarse juntos por primera vez a un lugar nuevo. Las fotos no alcanzan para contar todo lo que vivimos.
+        </p>
+        <div class="tl-photo" title="Añadir foto del viaje" style="height:180px;">
+          <div class="photo-overlay"></div>
+           <img src="placeholder.jpg" alt="Primer viaje">
+          <span class="photo-icon">✈️</span>
+          <span class="photo-label">Añadir foto del viaje</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 4: Mensaje importante -->
+    <article class="tl-item" data-year="Jun 2022">
+      <div class="tl-year">Jun 2022</div>
+      <div class="tl-card">
+        <span class="tl-tag">Momento especial</span>
+        <h3 class="tl-card-title">El mensaje que guardé</h3>
+        <p class="tl-card-body">
+          <!-- ✏️ EDITA: describe el contexto de este mensaje. -->
+          Hay mensajes que se guardan para siempre. Este fue uno de esos.
+        </p>
+        <blockquote class="tl-quote">
+          <!-- ✏️ EDITA: pega aquí el mensaje real, o escríbelo de memoria. -->
+          "Pon aquí el mensaje más bonito que te han enviado. Puede tener varias líneas y se verá elegante en cursiva."
+        </blockquote>
+      </div>
+    </article>
+
+    <!-- 5: Aniversario 5 años -->
+    <article class="tl-item highlight" data-year="Hoy">
+      <div class="tl-year" style="background: var(--rose-dk);">✦ Hoy</div>
+      <div class="tl-card">
+        <span class="heart-badge">♥</span>
+        <span class="tl-tag" style="background:rgba(125,46,64,.1);color:var(--rose-dk);">5 años juntos</span>
+        <h3 class="tl-card-title">Nuestro aniversario</h3>
+        <p class="tl-card-body">
+          <!-- ✏️ EDITA: algo especial para el presente, lo que sienten hoy. -->
+          Cinco años y el corazón sigue igual que el primer día. Lo que viene va a ser todavía más bonito.
+        </p>
+        <blockquote class="tl-quote">
+          "Gracias por estos 5 años."
+        </blockquote>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="tl-footer">
+  <p class="tl-footer-title">¿Quieres ver más?</p>
+  <p class="tl-footer-sub">La galería secreta tiene fotos, videos, cartas y nuestra playlist.</p>
+  <a href="galeria.html" class="btn-gallery">Abrir galería secreta →</a>
+</footer>
+
+<script>
+  // Scroll reveal con IntersectionObserver
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.tl-item').forEach(item => observer.observe(item));
+
+  // Placeholder click -> prompt de imagen (puedes cambiar por input[type=file])
+  document.querySelectorAll('.tl-photo').forEach(photo => {
+    if (!photo.querySelector('img')) {
+      photo.addEventListener('click', () => {
+        alert('');
+      });
+    }
+  });
+  const musica = new Audio('snoozybeats-lofi-girl-309226.mp3');
+  musica.loop = true;
+  musica.volume = 0.5;
+  musica.play().catch(() => {
+    // En algunos navegadores, la reproducción automática está bloqueada. Puedes mostrar un botón para iniciar la música manualmente.
+    const playBtn = document.createElement('button');
+    playBtn.textContent = 'Reproducir música de fondo';
+    playBtn.style.padding = '10px 20px';
+    playBtn.style.background = 'var(--rose)';
+    playBtn.style.color = '#fff';
+    playBtn.style.border = 'none';
+    playBtn.style.borderRadius = '5px';
+    playBtn.style.position = 'fixed';
+    playBtn.style.bottom = '20px';
+    playBtn.style.left = '50%';
+    playBtn.style.transform = 'translateX(-50%)';
+    playBtn.style.cursor = 'pointer';
+    document.body.appendChild(playBtn); 
+    playBtn.addEventListener('click', () => {
+      musica.play();
+      playBtn.remove();
+    });
+  });
+</script>
+</body>
+</html>
