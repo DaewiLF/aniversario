@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galería Secreta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ══════════════════════════════════════
+     1. VARIABLES Y RESET
+  ══════════════════════════════════════ */
+  :root {
+    --rose:    #c0526a;
+    --rose-lt: #e8a0b0;
+    --rose-dk: #7d2e40;
+    --rose-xs: rgba(192,82,106,.06);
+    --cream:   #fdf6f0;
+    --warm:    #f5e6d8;
+    --text:    #2a1a1e;
+    --muted:   #7a5c63;
+    --card:    #ffffff;
+    --border:  rgba(192,82,106,.14);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ══════════════════════════════════════
+     2. ANIMACIONES GLOBALES
+  ══════════════════════════════════════ */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%       { transform: translateX(-6px); }
+    75%       { transform: translateX(6px); }
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.12); }
+  }
+
+  /* ══════════════════════════════════════
+     3. PANTALLA DE BLOQUEO
+  ══════════════════════════════════════ */
+  #lock-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    position: relative;
+    overflow: hidden;
+    background: var(--cream);
+  }
+
+  #lock-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 25%, rgba(192,82,106,.10) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 85% 75%, rgba(232,160,176,.10) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  /* Decoraciones circulares */
+  .lock-deco {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .ld-1 { width: 300px; height: 300px; border: 1px solid rgba(192,82,106,.08); top: -80px;  right: -80px; }
+  .ld-2 { width: 200px; height: 200px; border: 1px solid rgba(192,82,106,.06); bottom: 5%; left: -60px;  }
+  .ld-3 { width: 120px; height: 120px; border: 1px solid rgba(192,82,106,.10); top: 40%;   right: 8%;   }
+
+  /* Contenido central */
+  .lock-content {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+    animation: fadeIn .7s ease both;
+  }
+
+  .lock-icon-wrap {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(192,82,106,.12), rgba(192,82,106,.06));
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 36px;
+  }
+
+  .lock-eyebrow {
+    font-size: 11px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  .lock-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 44px);
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.15;
+  }
+  .lock-title em { font-style: italic; color: var(--rose); }
+
+  .lock-hint {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  /* ── PIN dots ── */
+  .pin-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .pin-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rose-lt);
+    background: transparent;
+    transition: background .2s ease, transform .15s ease;
+  }
+  .pin-dot.on    { background: var(--rose);  border-color: var(--rose);  transform: scale(1.1); }
+  .pin-dot.error { background: #e24b4a;      border-color: #e24b4a;      animation: shake .4s ease; }
+
+  .pin-format {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 32px;
+    font-weight: 300;
+  }
+
+  /* ── Numpad ── */
+  .numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 64px);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .num-btn {
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
+    box-shadow: 0 2px 8px rgba(192,82,106,.05);
+  }
+  .num-btn:hover  { background: rgba(192,82,106,.06); border-color: var(--rose-lt); transform: scale(1.06); }
+  .num-btn:active { transform: scale(.94); }
+
+  .num-btn.util {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    font-size: 20px;
+    color: var(--muted);
+  }
+  .num-btn.util:hover { background: rgba(0,0,0,.04); border-color: transparent; }
+
+  .err-txt {
+    font-size: 12px;
+    color: #e24b4a;
+    min-height: 18px;
+    margin-bottom: 4px;
+    animation: fadeIn .2s ease;
+  }
+
+  .key-hint {
+    font-size: 11px;
+    color: var(--rose-lt);
+    font-weight: 300;
+  }
+
+  /* ══════════════════════════════════════
+     4. GALERÍA — ESTRUCTURA GENERAL
+  ══════════════════════════════════════ */
+  #gallery {
+    display: none;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+  #gallery.open { display: flex; }
+
+  /* ── Header ── */
+  .gal-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    animation: slideDown .5s ease both;
+  }
+
+  .gal-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--rose-dk);
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gal-lock-back {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    font-weight: 400;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    transition: background .2s, color .2s;
+  }
+  .gal-lock-back:hover { background: rgba(0,0,0,.04); border-color: var(--border); color: var(--text); }
+
+  /* ── Tab nav ── */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    padding: 16px 24px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .2s, border-color .2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab-btn .emoji { margin-right: 6px; font-size: 14px; }
+  .tab-btn:hover  { color: var(--rose); }
+  .tab-btn.active { color: var(--rose-dk); border-bottom-color: var(--rose); }
+
+  /* ── Tab panels ── */
+  .tab-panel {
+    display: none;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    width: 100%;
+    animation: fadeIn .4s ease both;
+  }
+  .tab-panel.active { display: block; }
+
+  /* ── Títulos de panel ── */
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .panel-title em { font-style: italic; color: var(--rose); }
+
+  .panel-sub {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  /* ══════════════════════════════════════
+     5. PANEL FOTOS
+  ══════════════════════════════════════ */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+
+  .filter-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s ease;
+  }
+  .filter-btn:hover,
+  .filter-btn.active { background: var(--rose); color: #fff; border-color: var(--rose); }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .photo-wrap {
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn .3s ease both;
+  }
+
+  .photo-cell {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--warm);
+    border: 1px dashed rgba(192,82,106,.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .photo-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+  }
+  .photo-cell:hover { transform: scale(1.03); box-shadow: 0 8px 32px rgba(192,82,106,.15); }
+
+  .photo-caption {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 400;
+  }
+
+  /* ══════════════════════════════════════
+     6. PANEL CARTAS
+  ══════════════════════════════════════ */
+  .letters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .letter-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow .3s ease;
+  }
+  .letter-card:hover { box-shadow: 0 8px 32px rgba(192,82,106,.1); }
+
+  .letter-card::before {
+    content: '"';
+    font-family: 'Playfair Display', serif;
+    font-size: 120px;
+    color: rgba(192,82,106,.05);
+    position: absolute;
+    top: -20px;
+    left: 12px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .letter-from {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 12px;
+  }
+
+  .letter-date {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-left: 8px;
+  }
+
+  .letter-body {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ══════════════════════════════════════
+     7. PANEL PLAYLIST (YOUTUBE)
+  ══════════════════════════════════════ */
+
+  /* Reproductor principal */
+  .yt-player-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .yt-embed-area {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 */
+    background: #0f0f0f;
+  }
+
+  .yt-embed-area iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* Lista de canciones debajo del reproductor */
+  .yt-tracklist-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+
+  .yt-tracklist-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--warm);
+  }
+
+  .yt-tracklist-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, rgba(192,82,106,.2), rgba(232,160,176,.15));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .yt-tracklist-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .yt-tracklist-sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-top: 2px;
+  }
+
+  /* Filas de canciones */
+  .yt-song-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(192,82,106,.06);
+    cursor: pointer;
+    transition: background .15s ease;
+  }
+  .yt-song-row:last-child { border-bottom: none; }
+  .yt-song-row:hover      { background: var(--rose-xs); }
+  .yt-song-row.playing    { background: rgba(192,82,106,.08); }
+
+  .yt-song-num {
+    width: 22px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .yt-song-row.playing .yt-song-num { color: var(--rose); font-weight: 700; }
+  .yt-song-row:hover .yt-song-num   { display: none; }
+  .yt-song-play {
+    display: none;
+    width: 22px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--rose);
+    flex-shrink: 0;
+  }
+  .yt-song-row:hover .yt-song-play  { display: block; }
+
+  .yt-song-thumb {
+    width: 52px;
+    height: 36px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--warm);
+    flex-shrink: 0;
+  }
+
+  .yt-song-info  { flex: 1; min-width: 0; }
+  .yt-song-name  {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .yt-song-row.playing .yt-song-name { color: var(--rose); }
+  .yt-song-ch {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .yt-song-ext {
+    font-size: 11px;
+    color: var(--rose-lt);
+    flex-shrink: 0;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    transition: background .15s, color .15s;
+  }
+  .yt-song-ext:hover { background: var(--rose); color: #fff; border-color: var(--rose); }
+
+  /* ══════════════════════════════════════
+     8. MENSAJE FINAL
+  ══════════════════════════════════════ */
+  .final-section {
+    text-align: center;
+    padding: 60px 24px 80px;
+    max-width: 560px;
+    margin: 0 auto;
+    animation: fadeIn .6s ease both;
+  }
+
+  .final-divider {
+    width: 48px;
+    height: 1px;
+    background: var(--rose-lt);
+    margin: 28px auto;
+  }
+
+  .final-hearts {
+    font-size: 40px;
+    margin-bottom: 20px;
+    display: block;
+    animation: heartbeat 2s ease-in-out infinite;
+  }
+
+  .final-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(28px, 5vw, 42px);
+    color: var(--rose-dk);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .final-body {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+
+  .btn-back {
+    display: inline-block;
+    padding: 12px 28px;
+    border: 1px solid var(--border);
+    color: var(--rose);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 50px;
+    text-decoration: none;
+    cursor: pointer;
+    background: transparent;
+    transition: background .2s ease, border-color .2s ease;
+  }
+  .btn-back:hover { background: rgba(192,82,106,.06); border-color: var(--rose-lt); }
+
+  /* ══════════════════════════════════════
+     9. LIGHTBOX
+  ══════════════════════════════════════ */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 5, 8, 0.93);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+    animation: fadeIn .25s ease both;
+  }
+  .lightbox.open { display: flex; }
+
+  .lb-close {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    font-size: 36px;
+    color: rgba(255,255,255,.6);
+    cursor: pointer;
+    line-height: 1;
+    z-index: 101;
+    transition: color .2s, transform .2s;
+  }
+  .lb-close:hover { color: #fff; transform: scale(1.1); }
+
+  .lb-img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 8px;
+    object-fit: contain;
+    box-shadow: 0 8px 40px rgba(0,0,0,.5);
+    transition: transform 0.2s ease;
+  }
+
+  .lb-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 32px;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    padding: 16px;
+    user-select: none;
+    z-index: 102;
+    transition: color .2s, transform .1s;
+  }
+  .lb-arrow:hover      { color: #fff; }
+  .lb-arrow-left       { left: 10px; }
+  .lb-arrow-right      { right: 10px; }
+  .lb-arrow:active     { transform: translateY(-50%) scale(0.9); }
+
+  /* ══════════════════════════════════════
+     10. RESPONSIVE
+  ══════════════════════════════════════ */
+  @media (max-width: 600px) {
+    .gal-header  { padding: 0 16px; }
+    .tab-nav     { padding: 0 16px; }
+    .tab-btn     { padding: 14px 16px; font-size: 12px; }
+    .tab-panel   { padding: 28px 16px 60px; }
+    .letter-card { padding: 20px; }
+    .lb-arrow    { display: none; }
+    .yt-tracklist-header { padding: 14px 16px; }
+    .yt-song-row         { padding: 10px 14px; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     PANTALLA DE BLOQUEO
+══════════════════════════════════════ -->
+<div id="lock-screen">
+  <div class="lock-deco ld-1"></div>
+  <div class="lock-deco ld-2"></div>
+  <div class="lock-deco ld-3"></div>
+
+  <div class="lock-content">
+    <div class="lock-icon-wrap">🔒</div>
+    <p class="lock-eyebrow">Acceso privado</p>
+    <h1 class="lock-title"><em>Galería</em> secreta</h1>
+    <p class="lock-hint">Solo tú sabes la clave.</p>
+
+    <div class="pin-row" id="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+      <div class="pin-dot" id="d4"></div>
+      <div class="pin-dot" id="d5"></div>
+      <div class="pin-dot" id="d6"></div>
+      <div class="pin-dot" id="d7"></div>
+    </div>
+    <p class="pin-format">Formato: DDMMAAAA</p>
+
+    <div class="numpad" id="numpad">
+      <button class="num-btn" onclick="key('1')">1</button>
+      <button class="num-btn" onclick="key('2')">2</button>
+      <button class="num-btn" onclick="key('3')">3</button>
+      <button class="num-btn" onclick="key('4')">4</button>
+      <button class="num-btn" onclick="key('5')">5</button>
+      <button class="num-btn" onclick="key('6')">6</button>
+      <button class="num-btn" onclick="key('7')">7</button>
+      <button class="num-btn" onclick="key('8')">8</button>
+      <button class="num-btn" onclick="key('9')">9</button>
+      <button class="num-btn util" onclick="clearPin()" aria-label="Limpiar">⟳</button>
+      <button class="num-btn" onclick="key('0')">0</button>
+      <button class="num-btn util" onclick="del()" aria-label="Borrar">⌫</button>
+    </div>
+
+    <p class="err-txt" id="err-msg"></p>
+    <p class="key-hint">Pulsa un número o usa el teclado</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     GALERÍA DESBLOQUEADA
+══════════════════════════════════════ -->
+<div id="gallery">
+
+  <header class="gal-header">
+    <div class="gal-brand">♥ Nuestra galería</div>
+    <button class="gal-lock-back" onclick="lockGallery()">🔒 Cerrar</button>
+  </header>
+
+  <nav class="tab-nav" role="tablist">
+    <button class="tab-btn active" onclick="showTab('fotos',this)"    role="tab"><span class="emoji">📸</span>Fotos</button>
+    <button class="tab-btn"        onclick="showTab('cartas',this)"   role="tab"><span class="emoji">💌</span>Cartas</button>
+    <button class="tab-btn"        onclick="showTab('playlist',this)" role="tab"><span class="emoji">🎵</span>Playlist</button>
+  </nav>
+
+  <!-- ── PANEL: FOTOS ── -->
+  <div class="tab-panel active" id="panel-fotos" role="tabpanel">
+    <h2 class="panel-title">Nuestras <em>fotos</em></h2>
+    <p class="panel-sub">Los momentos que merecen guardarse para siempre.</p>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filtrarCategoria('todas', this)">✨ Todas</button>
+      <button class="filter-btn" onclick="filtrarCategoria('random', this)">📷 Cotidianos</button>
+    </div>
+
+    <div class="photo-grid" id="photo-grid-container">
+      <p style="grid-column:1/-1; text-align:center; color:var(--muted); padding:40px 0; font-style:italic;">
+        Preparando los recuerdos...
+      </p>
+    </div>
+  </div>
+
+  <!-- ── PANEL: CARTAS ── -->
+<div class="tab-panel" id="panel-cartas" role="tabpanel">
+    <h2 class="panel-title">Nuestras <em>cartas</em></h2>
+    <p class="panel-sub">Las palabras que valen más que cualquier foto.</p>
+
+    <!-- Un solo contenedor para todas las cartas -->
+    <div class="letters-list">
+      
+      <!-- Carta 1 -->
+      <article class="letter-card">
+        <p class="letter-from">De mi para ti <span class="letter-date">2026</span></p>
+        <p class="letter-body">
+          "Desde el primer día supe que había algo especial en la forma en que me mirabas"
+        </p>
+      </article>
+
+      <!-- Carta 2 -->
+      <article class="letter-card">
+        <p class="letter-from">De mi para ti <span class="letter-date">2026</span></p>
+        <p class="letter-body">
+          "A medida que pasa el tiempo, me doy cuenta de que mi lugar favorito en todo el mundo siempre será a tu lado. Gracias por darme tanta paz."
+        </p>
+      </article>
+
+      <!-- Carta 3 -->
+      <article class="letter-card">
+        <p class="letter-from">De mi para ti <span class="letter-date">2026</span></p>
+        <p class="letter-body">
+          "A veces me quedo pensando en tus ataques de risa de la nada, y me doy cuenta de que esa se ha convertido en mi melodía favorita."
+        </p>
+      </article>
+
+      <!-- Carta 4 -->
+      <article class="letter-card">
+        <p class="letter-from">De mi para ti <span class="letter-date">2026</span></p>
+        <p class="letter-body">
+          "Guardo cada pequeño recuerdo nuestro como un tesoro. Hasta las tardes donde no hacemos nada, son perfectas si estamos juntos."
+        </p>
+      </article>
+
+      <!-- Carta 5 -->
+      <article class="letter-card">
+        <p class="letter-from">De mi para ti <span class="letter-date">· Enero 2026</span></p>
+        <p class="letter-body">
+          "No sé con exactitud todas las cosas que nos depare el futuro, pero mientras caminemos agarrados de la mano, tengo la certeza de que estaremos bien. Te Amo."
+        </p>
+      </article>
+
+    </div>
+  </div>
+  
+
+  <!-- ── PANEL: PLAYLIST YOUTUBE ── -->
+  <div class="tab-panel" id="panel-playlist" role="tabpanel">
+    <h2 class="panel-title">Nuestra <em>playlist</em></h2>
+    <p class="panel-sub">Las canciones que cuentan lo que las palabras no alcanzan.</p>
+
+    <!-- Reproductor 16:9 -->
+    <div class="yt-player-wrap">
+      <div class="yt-embed-area">
+        <iframe
+          id="yt-main-iframe"
+          src="https://www.youtube.com/embed/videoseries?list=PLBEiaNCvszFKBEsTqWHoMrnNDW20X_z83&rel=0&modestbranding=1"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+
+    <!-- Lista de canciones -->
+    <div class="yt-tracklist-wrap">
+      <div class="yt-tracklist-header">
+        <div class="yt-tracklist-icon">🎵</div>
+        <div>
+          <p class="yt-tracklist-title">Nuestra playlist</p>
+          <p class="yt-tracklist-sub" id="yt-count">Las canciones de nosotros ♥</p>
+        </div>
+      </div>
+      <div id="yt-song-list">
+        <div style="padding:24px; text-align:center; color:var(--muted); font-size:13px; font-weight:300;">
+          Cargando canciones…
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje final -->
+    <div class="final-section">
+      <div class="final-divider"></div>
+      <span class="final-hearts">♥</span>
+      <h2 class="final-title">Gracias por estos<br>años.</h2>
+      <p class="final-body">
+        Por cada risa, cada silencio cómodo, cada aventura
+        y cada momento ordinario que se volvió extraordinario a tu lado.
+      </p>
+      <a href="timeline.html" class="btn-back">← Ver nuestra historia</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     LIGHTBOX
+══════════════════════════════════════ -->
+<div class="lightbox" id="lightbox">
+  <span class="lb-close" onclick="cerrarLightbox()">×</span>
+  <span class="lb-arrow lb-arrow-left"  onclick="cambiarFoto(-1, event)">‹</span>
+  <img  class="lb-img" id="lb-img" src="" alt="" onclick="event.stopPropagation()">
+  <span class="lb-arrow lb-arrow-right" onclick="cambiarFoto(1, event)">›</span>
+</div>
+
+<script>
+  // ══════════════════════════════════════
+  // 1. CONFIGURACIÓN DE GITHUB (¡CÁMBIALO AQUÍ!)
+  // ══════════════════════════════════════
+  const GITHUB_USER   = 'DaewiLF';    // Tu usuario de GitHub
+  const GITHUB_REPO   = 'aniversario'; // Nombre del repositorio
+  const CARPETA_FOTOS = 'fotos';       // Carpeta donde están las imágenes
+
+  let BASE_DE_FOTOS          = [];
+  let fotosFiltradasActuales = [];
+  let fotoActualIndex        = 0;
+
+  // ══════════════════════════════════════
+  // 2. CARGA DE FOTOS (GITHUB API + CACHÉ)
+  // ══════════════════════════════════════
+  const photoGridContainer = document.getElementById('photo-grid-container');
+
+  async function inicializarGaleria() {
+    const cacheKey   = 'galeria_secreta_cache';
+    const cachedData = localStorage.getItem(cacheKey);
+
+    if (cachedData) {
+      BASE_DE_FOTOS = JSON.parse(cachedData);
+      finalizarCarga();
+    } else {
+      try {
+        const url      = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_FOTOS}`;
+        const response = await fetch(url);
+
+        if (!response.ok) throw new Error('No se pudo obtener la lista de archivos.');
+
+        const archivos         = await response.json();
+        const extensionesValidas = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+
+        BASE_DE_FOTOS = archivos
+          .filter(file => file.type === 'file' && extensionesValidas.some(ext => file.name.toLowerCase().endsWith(ext)))
+          .map(file => {
+            const nombreLimpio = file.name
+              .substring(0, file.name.lastIndexOf('.'))
+              .replace(/[-_]/g, ' ');
+            return {
+              src:      file.path,
+              titulo:   nombreLimpio.charAt(0).toUpperCase() + nombreLimpio.slice(1),
+              fecha:    '♥',
+              categoria:'random'
+            };
+          });
+
+        localStorage.setItem(cacheKey, JSON.stringify(BASE_DE_FOTOS));
+        finalizarCarga();
+
+      } catch (error) {
+        console.error('Error mapeando la carpeta de fotos:', error);
+        photoGridContainer.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--muted); padding:40px 0;">
+          No se pudieron cargar las fotos. Verifica usuario y repositorio.
+        </p>`;
+      }
+    }
+  }
+
+  function finalizarCarga() {
+    fotosFiltradasActuales = [...BASE_DE_FOTOS];
+    renderizarFotos(fotosFiltradasActuales);
+  }
+
+  function renderizarFotos(arr) {
+    photoGridContainer.innerHTML = '';
+    if (arr.length === 0) {
+      photoGridContainer.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--muted); padding:40px 0; font-weight:300;">Aún no hay fotos cargadas ♥</p>`;
+      return;
+    }
+    arr.forEach((foto, index) => {
+      photoGridContainer.insertAdjacentHTML('beforeend', `
+        <div class="photo-wrap">
+          <div class="photo-cell" onclick="abrirLightbox(${index})">
+            <img src="${foto.src}" alt="${foto.titulo}" loading="lazy">
+          </div>
+          <p class="photo-caption">${foto.titulo}<br><span style="font-size:10px;opacity:.7">${foto.fecha}</span></p>
+        </div>
+      `);
+    });
+  }
+
+  function filtrarCategoria(categoria, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    fotosFiltradasActuales = categoria === 'todas'
+      ? [...BASE_DE_FOTOS]
+      : BASE_DE_FOTOS.filter(f => f.categoria === categoria);
+    renderizarFotos(fotosFiltradasActuales);
+  }
+
+  // ══════════════════════════════════════
+  // 3. LIGHTBOX
+  // ══════════════════════════════════════
+  const lightbox    = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lb-img');
+
+  function abrirLightbox(index) {
+    fotoActualIndex = index;
+    lightboxImg.src = fotosFiltradasActuales[index].src;
+    lightbox.classList.add('open');
+  }
+
+  function cerrarLightbox() { lightbox.classList.remove('open'); }
+
+  function cambiarFoto(dir, event) {
+    if (event) event.stopPropagation();
+    fotoActualIndex = (fotoActualIndex + dir + fotosFiltradasActuales.length) % fotosFiltradasActuales.length;
+    lightboxImg.src = fotosFiltradasActuales[fotoActualIndex].src;
+  }
+
+  lightbox.addEventListener('click', cerrarLightbox);
+
+  document.addEventListener('keydown', e => {
+    if (lightbox.classList.contains('open')) {
+      if (e.key === 'Escape')      cerrarLightbox();
+      if (e.key === 'ArrowRight')  cambiarFoto(1);
+      if (e.key === 'ArrowLeft')   cambiarFoto(-1);
+    }
+  });
+
+  // ══════════════════════════════════════
+  // 4. PIN / ACCESO
+  // ══════════════════════════════════════
+  const SECRET = '09062021'; // ← año cambiado a 2021
+  let pin = '';
+
+  function key(k) {
+    if (pin.length >= 8) return;
+    pin += k;
+    updateDots();
+    if (pin.length === 8) setTimeout(tryUnlock, 200);
+  }
+
+  function del() { pin = pin.slice(0, -1); updateDots(); clearErr(); }
+
+  function clearPin() { pin = ''; updateDots(); clearErr(); }
+
+  function clearErr() { document.getElementById('err-msg').textContent = ''; }
+
+  function updateDots() {
+    for (let i = 0; i < 8; i++) {
+      const d = document.getElementById('d' + i);
+      d.classList.toggle('on', i < pin.length);
+      d.classList.remove('error');
+    }
+  }
+
+  function tryUnlock() {
+    if (pin === SECRET) {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('gallery').classList.add('open');
+      if (BASE_DE_FOTOS.length === 0) inicializarGaleria();
+    } else {
+      document.getElementById('err-msg').textContent = 'Fecha incorrecta. Inténtalo de nuevo.';
+      document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('error'));
+      pin = '';
+      setTimeout(() => {
+        document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error', 'on'));
+      }, 600);
+    }
+  }
+
+  function lockGallery() {
+    document.getElementById('gallery').classList.remove('open');
+    document.getElementById('lock-screen').style.display = 'flex';
+    pin = '';
+    updateDots();
+    clearErr();
+  }
+
+  // Doble clic en ⟳ para limpiar caché de fotos
+  document.querySelector('.util[aria-label="Limpiar"]').addEventListener('dblclick', () => {
+    localStorage.removeItem('galeria_secreta_cache');
+    alert('Caché de fotos limpiada. Se volverán a descargar de GitHub al entrar.');
+  });
+
+  document.addEventListener('keydown', e => {
+    const lockVisible = document.getElementById('lock-screen').style.display !== 'none';
+    if (lockVisible) {
+      if (e.key >= '0' && e.key <= '9') key(e.key);
+      else if (e.key === 'Backspace')   del();
+      else if (e.key === 'Escape')      clearPin();
+    }
+  });
+
+  // ══════════════════════════════════════
+  // 5. TABS
+  // ══════════════════════════════════════
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ══════════════════════════════════════
+  // 6. PLAYLIST YOUTUBE
+  // ══════════════════════════════════════
+  const YT_PLAYLIST_ID = 'PLBEiaNCvszFKBEsTqWHoMrnNDW20X_z83';
+
+  // Lista de videos de la playlist (IDs extraídos de la playlist pública)
+  // YouTube no permite listar items sin API key, pero sí podemos mostrar
+  // las canciones usando los IDs directos del RSS público de YouTube.
+  (async function cargarCanciones() {
+    const lista = document.getElementById('yt-song-list');
+    const countEl = document.getElementById('yt-count');
+
+    try {
+      // RSS feed público de YouTube playlists (no requiere API key)
+      const rssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${YT_PLAYLIST_ID}`;
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+
+      const res  = await fetch(proxyUrl);
+      const json = await res.json();
+      const parser = new DOMParser();
+      const xml  = parser.parseFromString(json.contents, 'text/xml');
+      const entries = Array.from(xml.querySelectorAll('entry'));
+
+      if (!entries.length) throw new Error('Sin resultados');
+
+      countEl.textContent = `${entries.length} canciones ♥`;
+      lista.innerHTML = '';
+
+      let indiceActual = 0;
+
+      entries.forEach((entry, i) => {
+        const videoId = entry.querySelector('videoId')?.textContent
+                     || entry.querySelector('id')?.textContent?.split(':').pop();
+        const title   = entry.querySelector('title')?.textContent || 'Sin título';
+        const author  = entry.querySelector('author name')?.textContent || '';
+        const thumb   = `https://i.ytimg.com/vi/${videoId}/default.jpg`;
+
+        const row = document.createElement('div');
+        row.className = 'yt-song-row' + (i === 0 ? ' playing' : '');
+        row.innerHTML = `
+          <span class="yt-song-num">${i + 1}</span>
+          <span class="yt-song-play">▶</span>
+          <img class="yt-song-thumb" src="${thumb}" alt="${title}" loading="lazy">
+          <div class="yt-song-info">
+            <p class="yt-song-name">${title}</p>
+            <p class="yt-song-ch">${author}</p>
+          </div>
+          <a class="yt-song-ext" href="https://www.youtube.com/watch?v=${videoId}&list=${YT_PLAYLIST_ID}" target="_blank" rel="noopener" title="Abrir en YouTube">↗</a>
+        `;
+
+        row.addEventListener('click', (e) => {
+          if (e.target.classList.contains('yt-song-ext')) return;
+          // Cambiar el iframe al video seleccionado
+          document.getElementById('yt-main-iframe').src =
+            `https://www.youtube-nocookie.com/embed/${videoId}?list=${YT_PLAYLIST_ID}&index=${i}&autoplay=1&rel=0&modestbranding=1`;
+          // Marcar fila activa
+          document.querySelectorAll('.yt-song-row').forEach(r => r.classList.remove('playing'));
+          row.classList.add('playing');
+          indiceActual = i;
+          // Scroll suave al reproductor
+          document.getElementById('yt-main-iframe').closest('.yt-player-wrap')
+            .scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        lista.appendChild(row);
+      });
+
+    } catch (err) {
+      // Si el RSS falla (CORS, etc.), mostrar un mensaje limpio sin romper la página
+      lista.innerHTML = `
+        <div style="padding:20px 24px; color:var(--muted); font-size:13px; font-weight:300; line-height:1.7;">
+          🎵 La playlist está disponible en el reproductor de arriba.<br>
+          <a href="https://www.youtube.com/playlist?list=${YT_PLAYLIST_ID}" target="_blank" rel="noopener"
+             style="color:var(--rose); text-decoration:none; font-weight:500;">
+            Ver lista completa en YouTube ↗
+          </a>
+        </div>`;
+      countEl.textContent = 'Las canciones de nosotros ♥';
+    }
+  })();
+    const musica = new Audio('Joe Hisaishi - Merry-Go-Round of Life (from Howls Moving Castle).mp3');
+  musica.loop = true;
+  musica.volume = 0.5;
+  musica.play().catch(() => {
+    const playBtn = document.createElement('button');
+    playBtn.textContent = 'Reproducir música de fondo';
+    playBtn.style.padding = '10px 20px';
+    playBtn.style.background = 'var(--rose)';
+    playBtn.style.color = '#fff';
+    playBtn.style.border = 'none';
+    playBtn.style.borderRadius = '5px';
+    playBtn.style.position = 'fixed';
+    playBtn.style.bottom = '20px';
+    playBtn.style.left = '50%';
+    playBtn.style.transform = 'translateX(-50%)';
+    playBtn.style.cursor = 'pointer';
+    document.body.appendChild(playBtn); 
+    playBtn.addEventListener('click', () => {
+      musica.play();
+      playBtn.remove();
+    });
+  });
+</script>
+</body>
+</html>

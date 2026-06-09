@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+
+  /* ══════════════════════════════════════
+     1. VARIABLES Y RESET
+  ══════════════════════════════════════ */
   :root {
     --rose:    #c0526a;
     --rose-lt: #e8a0b0;
@@ -21,8 +25,14 @@
     --border:  rgba(192,82,106,.14);
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
   html { scroll-behavior: smooth; }
+
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--cream);
@@ -32,7 +42,31 @@
   }
 
   /* ══════════════════════════════════════
-     PANTALLA DE BLOQUEO
+     2. ANIMACIONES GLOBALES
+  ══════════════════════════════════════ */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%       { transform: translateX(-6px); }
+    75%       { transform: translateX(6px); }
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.12); }
+  }
+
+  /* ══════════════════════════════════════
+     3. PANTALLA DE BLOQUEO
   ══════════════════════════════════════ */
   #lock-screen {
     min-height: 100vh;
@@ -56,15 +90,17 @@
     pointer-events: none;
   }
 
+  /* Decoraciones circulares */
   .lock-deco {
     position: absolute;
     border-radius: 50%;
     pointer-events: none;
   }
-  .ld-1 { width:300px;height:300px; border:1px solid rgba(192,82,106,.08); top:-80px; right:-80px; }
-  .ld-2 { width:200px;height:200px; border:1px solid rgba(192,82,106,.06); bottom:5%; left:-60px; }
-  .ld-3 { width:120px;height:120px; border:1px solid rgba(192,82,106,.10); top:40%; right:8%; }
+  .ld-1 { width: 300px; height: 300px; border: 1px solid rgba(192,82,106,.08); top: -80px;  right: -80px; }
+  .ld-2 { width: 200px; height: 200px; border: 1px solid rgba(192,82,106,.06); bottom: 5%; left: -60px;  }
+  .ld-3 { width: 120px; height: 120px; border: 1px solid rgba(192,82,106,.10); top: 40%;   right: 8%;   }
 
+  /* Contenido central */
   .lock-content {
     position: relative;
     text-align: center;
@@ -73,11 +109,14 @@
   }
 
   .lock-icon-wrap {
-    width: 80px; height: 80px;
+    width: 80px;
+    height: 80px;
     background: linear-gradient(135deg, rgba(192,82,106,.12), rgba(192,82,106,.06));
     border: 1px solid var(--border);
     border-radius: 24px;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0 auto 28px;
     font-size: 36px;
   }
@@ -98,7 +137,6 @@
     margin-bottom: 6px;
     line-height: 1.15;
   }
-
   .lock-title em { font-style: italic; color: var(--rose); }
 
   .lock-hint {
@@ -108,7 +146,7 @@
     margin-bottom: 40px;
   }
 
-  /* PIN display */
+  /* ── PIN dots ── */
   .pin-row {
     display: flex;
     gap: 10px;
@@ -117,24 +155,15 @@
   }
 
   .pin-dot {
-    width: 14px; height: 14px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     border: 1.5px solid var(--rose-lt);
     background: transparent;
     transition: background .2s ease, transform .15s ease;
   }
-
-  .pin-dot.on {
-    background: var(--rose);
-    border-color: var(--rose);
-    transform: scale(1.1);
-  }
-
-  .pin-dot.error {
-    background: #e24b4a;
-    border-color: #e24b4a;
-    animation: shake .4s ease;
-  }
+  .pin-dot.on    { background: var(--rose);  border-color: var(--rose);  transform: scale(1.1); }
+  .pin-dot.error { background: #e24b4a;      border-color: #e24b4a;      animation: shake .4s ease; }
 
   .pin-format {
     font-size: 11px;
@@ -143,7 +172,7 @@
     font-weight: 300;
   }
 
-  /* Numpad */
+  /* ── Numpad ── */
   .numpad {
     display: grid;
     grid-template-columns: repeat(3, 64px);
@@ -163,13 +192,7 @@
     transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
     box-shadow: 0 2px 8px rgba(192,82,106,.05);
   }
-
-  .num-btn:hover {
-    background: rgba(192,82,106,.06);
-    border-color: var(--rose-lt);
-    transform: scale(1.06);
-  }
-
+  .num-btn:hover  { background: rgba(192,82,106,.06); border-color: var(--rose-lt); transform: scale(1.06); }
   .num-btn:active { transform: scale(.94); }
 
   .num-btn.util {
@@ -179,7 +202,6 @@
     font-size: 20px;
     color: var(--muted);
   }
-
   .num-btn.util:hover { background: rgba(0,0,0,.04); border-color: transparent; }
 
   .err-txt {
@@ -197,17 +219,16 @@
   }
 
   /* ══════════════════════════════════════
-     GALERÍA DESBLOQUEADA
+     4. GALERÍA — ESTRUCTURA GENERAL
   ══════════════════════════════════════ */
   #gallery {
     display: none;
     min-height: 100vh;
     flex-direction: column;
   }
-
   #gallery.open { display: flex; }
 
-  /* Top bar */
+  /* ── Header ── */
   .gal-header {
     background: var(--card);
     border-bottom: 1px solid var(--border);
@@ -239,17 +260,12 @@
     font-weight: 400;
     padding: 6px 12px;
     border-radius: 20px;
-    transition: background .2s, color .2s;
     border: 1px solid transparent;
+    transition: background .2s, color .2s;
   }
+  .gal-lock-back:hover { background: rgba(0,0,0,.04); border-color: var(--border); color: var(--text); }
 
-  .gal-lock-back:hover {
-    background: rgba(0,0,0,.04);
-    border-color: var(--border);
-    color: var(--text);
-  }
-
-  /* Tab nav */
+  /* ── Tab nav ── */
   .tab-nav {
     display: flex;
     gap: 0;
@@ -260,7 +276,6 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
-
   .tab-nav::-webkit-scrollbar { display: none; }
 
   .tab-btn {
@@ -278,13 +293,11 @@
     border-right: none;
     font-family: 'DM Sans', sans-serif;
   }
-
   .tab-btn .emoji { margin-right: 6px; font-size: 14px; }
-
-  .tab-btn:hover { color: var(--rose); }
+  .tab-btn:hover  { color: var(--rose); }
   .tab-btn.active { color: var(--rose-dk); border-bottom-color: var(--rose); }
 
-  /* Tab panels */
+  /* ── Tab panels ── */
   .tab-panel {
     display: none;
     max-width: 960px;
@@ -293,17 +306,15 @@
     width: 100%;
     animation: fadeIn .4s ease both;
   }
-
   .tab-panel.active { display: block; }
 
-  /* Panel heading */
+  /* ── Títulos de panel ── */
   .panel-title {
     font-family: 'Playfair Display', serif;
     font-size: 28px;
     color: var(--text);
     margin-bottom: 4px;
   }
-
   .panel-title em { font-style: italic; color: var(--rose); }
 
   .panel-sub {
@@ -313,7 +324,9 @@
     margin-bottom: 24px;
   }
 
-  /* Filtros de Categorías */
+  /* ══════════════════════════════════════
+     5. PANEL FOTOS
+  ══════════════════════════════════════ */
   .filter-bar {
     display: flex;
     gap: 8px;
@@ -323,7 +336,7 @@
     padding-bottom: 4px;
   }
   .filter-bar::-webkit-scrollbar { display: none; }
-  
+
   .filter-btn {
     padding: 6px 14px;
     font-size: 12px;
@@ -332,20 +345,22 @@
     background: var(--card);
     color: var(--muted);
     cursor: pointer;
-    transition: all .2s ease;
     font-family: 'DM Sans', sans-serif;
+    transition: all .2s ease;
   }
-  .filter-btn:hover, .filter-btn.active {
-    background: var(--rose);
-    color: #fff;
-    border-color: var(--rose);
-  }
+  .filter-btn:hover,
+  .filter-btn.active { background: var(--rose); color: #fff; border-color: var(--rose); }
 
-  /* ── FOTOS ── */
   .photo-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 12px;
+  }
+
+  .photo-wrap {
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn .3s ease both;
   }
 
   .photo-cell {
@@ -359,10 +374,9 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform .25s ease, box-shadow .25s ease;
     position: relative;
+    transition: transform .25s ease, box-shadow .25s ease;
   }
-
   .photo-cell img {
     width: 100%;
     height: 100%;
@@ -370,7 +384,6 @@
     position: absolute;
     inset: 0;
   }
-
   .photo-cell:hover { transform: scale(1.03); box-shadow: 0 8px 32px rgba(192,82,106,.15); }
 
   .photo-caption {
@@ -381,61 +394,9 @@
     font-weight: 400;
   }
 
-  .photo-wrap { display: flex; flex-direction: column; animation: fadeIn .3s ease both; }
-
-  /* ── VIDEOS ── */
-  .video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
-  }
-
-  .video-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform .25s ease, box-shadow .25s ease;
-  }
-
-  .video-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(192,82,106,.12); }
-
-  .video-thumb {
-    height: 160px;
-    background: var(--warm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .video-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .play-btn {
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    position: absolute;
-    box-shadow: 0 4px 16px rgba(0,0,0,.15);
-    transition: transform .2s ease;
-  }
-
-  .video-card:hover .play-btn { transform: scale(1.1); }
-  .video-info { padding: 14px 16px; }
-  .video-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
-  .video-meta { font-size: 12px; color: var(--muted); font-weight: 300; }
-
-  /* ── CARTAS ── */
+  /* ══════════════════════════════════════
+     6. PANEL CARTAS
+  ══════════════════════════════════════ */
   .letters-list {
     display: flex;
     flex-direction: column;
@@ -451,7 +412,6 @@
     overflow: hidden;
     transition: box-shadow .3s ease;
   }
-
   .letter-card:hover { box-shadow: 0 8px 32px rgba(192,82,106,.1); }
 
   .letter-card::before {
@@ -460,7 +420,8 @@
     font-size: 120px;
     color: rgba(192,82,106,.05);
     position: absolute;
-    top: -20px; left: 12px;
+    top: -20px;
+    left: 12px;
     line-height: 1;
     pointer-events: none;
   }
@@ -491,90 +452,238 @@
     z-index: 1;
   }
 
-  /* ── PLAYLIST ── */
-  .playlist-wrap {
+  /* ══════════════════════════════════════
+     7. PANEL PLAYLIST (YOUTUBE)
+  ══════════════════════════════════════ */
+
+  /* Caja de configuración del ID */
+  .yt-config-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .yt-config-box label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .yt-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--cream);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .yt-input:focus { border-color: var(--rose-lt); }
+  .yt-input::placeholder { color: var(--rose-lt); }
+
+  .yt-load-btn {
+    padding: 9px 20px;
+    background: var(--rose);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    white-space: nowrap;
+  }
+  .yt-load-btn:hover  { background: var(--rose-dk); }
+  .yt-load-btn:active { transform: scale(.97); }
+
+  /* Hint de cómo obtener el ID */
+  .yt-hint {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .yt-hint code {
+    background: var(--warm);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--rose-dk);
+  }
+
+  /* Contenedor del embed + lista lateral */
+  .yt-player-wrap {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 20px;
     overflow: hidden;
+    min-height: 360px;
   }
 
-  .playlist-header {
-    padding: 24px 28px;
+  .yt-embed-area {
+    position: relative;
+    background: #0f0f0f;
+    min-height: 300px;
+  }
+
+  .yt-embed-area iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 340px;
+    border: none;
+    display: block;
+  }
+
+  /* Placeholder cuando aún no hay playlist cargada */
+  .yt-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 300px;
+    gap: 12px;
+    color: rgba(255,255,255,.3);
+    font-size: 13px;
+    font-weight: 300;
+    padding: 32px;
+    text-align: center;
+  }
+  .yt-placeholder .yt-icon { font-size: 48px; opacity: .4; }
+
+  /* Panel lateral: lista de reproducción */
+  .yt-sidebar {
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .yt-sidebar-header {
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 16px;
-  }
-
-  .playlist-cover {
-    width: 56px; height: 56px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, rgba(192,82,106,.2), rgba(232,160,176,.15));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
+    gap: 10px;
+    background: var(--warm);
     flex-shrink: 0;
   }
 
-  .playlist-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    color: var(--text);
-    margin-bottom: 2px;
+  .yt-sidebar-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, rgba(192,82,106,.2), rgba(232,160,176,.15));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
   }
 
-  .playlist-count {
-    font-size: 13px;
+  .yt-sidebar-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .yt-sidebar-sub {
+    font-size: 11px;
     color: var(--muted);
     font-weight: 300;
+    margin-top: 1px;
   }
 
-  .playlist-items { padding: 0; }
+  /* Lista de videos de la playlist */
+  .yt-track-list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .yt-track-list::-webkit-scrollbar       { width: 4px; }
+  .yt-track-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .song-row {
+  .yt-track {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 14px 24px;
-    border-bottom: 1px solid rgba(192,82,106,.06);
+    gap: 10px;
+    padding: 10px 16px;
     cursor: pointer;
-    transition: background .15s ease;
+    border-bottom: 1px solid rgba(192,82,106,.05);
+    transition: background .15s;
   }
+  .yt-track:last-child { border-bottom: none; }
+  .yt-track:hover      { background: var(--rose-xs); }
+  .yt-track.playing    { background: rgba(192,82,106,.1); }
 
-  .song-row:last-child { border-bottom: none; }
-  .song-row:hover { background: var(--rose-xs); }
-
-  .song-num {
-    width: 20px;
-    text-align: center;
-    font-size: 13px;
+  .yt-track-num {
+    width: 18px;
+    font-size: 11px;
     color: var(--muted);
+    text-align: center;
     flex-shrink: 0;
   }
+  .yt-track.playing .yt-track-num { color: var(--rose); font-weight: 600; }
 
-  .song-row:hover .song-num { display: none; }
-  .song-play-ico { display: none; font-size: 14px; color: var(--rose); width: 20px; }
-  .song-row:hover .song-play-ico { display: flex; align-items: center; justify-content: center; }
-
-  .song-disc {
-    width: 40px; height: 40px;
-    border-radius: 8px;
+  .yt-track-thumb {
+    width: 44px;
+    height: 32px;
+    border-radius: 5px;
+    object-fit: cover;
     background: var(--warm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
     flex-shrink: 0;
   }
 
-  .song-info { flex: 1; min-width: 0; }
-  .song-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .song-artist { font-size: 12px; color: var(--muted); font-weight: 300; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .song-dur { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .yt-track-info { flex: 1; min-width: 0; }
+  .yt-track-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .yt-track.playing .yt-track-name { color: var(--rose); }
+  .yt-track-ch {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-  /* ── MENSAJE FINAL ── */
+  /* Estado de carga / error de la lista */
+  .yt-list-msg {
+    padding: 24px 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  /* ══════════════════════════════════════
+     8. MENSAJE FINAL
+  ══════════════════════════════════════ */
   .final-section {
     text-align: center;
     padding: 60px 24px 80px;
@@ -583,11 +692,18 @@
     animation: fadeIn .6s ease both;
   }
 
+  .final-divider {
+    width: 48px;
+    height: 1px;
+    background: var(--rose-lt);
+    margin: 28px auto;
+  }
+
   .final-hearts {
     font-size: 40px;
     margin-bottom: 20px;
-    animation: heartbeat 2s ease-in-out infinite;
     display: block;
+    animation: heartbeat 2s ease-in-out infinite;
   }
 
   .final-title {
@@ -607,13 +723,6 @@
     margin-bottom: 32px;
   }
 
-  .final-divider {
-    width: 48px;
-    height: 1px;
-    background: var(--rose-lt);
-    margin: 28px auto;
-  }
-
   .btn-back {
     display: inline-block;
     padding: 12px 28px;
@@ -628,11 +737,10 @@
     background: transparent;
     transition: background .2s ease, border-color .2s ease;
   }
-
   .btn-back:hover { background: rgba(192,82,106,.06); border-color: var(--rose-lt); }
 
   /* ══════════════════════════════════════
-     MODAL LIGHTBOX PERFECCIONADO
+     9. LIGHTBOX
   ══════════════════════════════════════ */
   .lightbox {
     position: fixed;
@@ -645,12 +753,12 @@
     padding: 24px;
     animation: fadeIn .25s ease both;
   }
-
   .lightbox.open { display: flex; }
 
   .lb-close {
     position: fixed;
-    top: 20px; right: 24px;
+    top: 20px;
+    right: 24px;
     font-size: 36px;
     color: rgba(255,255,255,.6);
     cursor: pointer;
@@ -678,29 +786,45 @@
     cursor: pointer;
     padding: 16px;
     user-select: none;
-    transition: color .2s, transform .1s;
     z-index: 102;
+    transition: color .2s, transform .1s;
   }
-  .lb-arrow:hover { color: #fff; }
-  .lb-arrow-left { left: 10px; }
-  .lb-arrow-right { right: 10px; }
-  .lb-arrow:active { transform: translateY(-50%) scale(0.9); }
+  .lb-arrow:hover      { color: #fff; }
+  .lb-arrow-left       { left: 10px; }
+  .lb-arrow-right      { right: 10px; }
+  .lb-arrow:active     { transform: translateY(-50%) scale(0.9); }
 
-  /* Responsive */
-  @media (max-width: 600px) {
-    .gal-header { padding: 0 16px; }
-    .tab-nav { padding: 0 16px; }
-    .tab-btn { padding: 14px 16px; font-size: 12px; }
-    .tab-panel { padding: 28px 16px 60px; }
-    .letter-card { padding: 20px; }
-    .playlist-header { padding: 16px; }
-    .song-row { padding: 12px 16px; }
-    .lb-arrow { display: none; } 
+  /* ══════════════════════════════════════
+     10. RESPONSIVE
+  ══════════════════════════════════════ */
+  @media (max-width: 720px) {
+    .yt-player-wrap {
+      grid-template-columns: 1fr;
+    }
+    .yt-sidebar {
+      border-left: none;
+      border-top: 1px solid var(--border);
+      max-height: 280px;
+    }
   }
+
+  @media (max-width: 600px) {
+    .gal-header   { padding: 0 16px; }
+    .tab-nav      { padding: 0 16px; }
+    .tab-btn      { padding: 14px 16px; font-size: 12px; }
+    .tab-panel    { padding: 28px 16px 60px; }
+    .letter-card  { padding: 20px; }
+    .yt-config-box { padding: 14px 16px; }
+    .lb-arrow     { display: none; }
+  }
+
 </style>
 </head>
 <body>
 
+<!-- ══════════════════════════════════════
+     PANTALLA DE BLOQUEO
+══════════════════════════════════════ -->
 <div id="lock-screen">
   <div class="lock-deco ld-1"></div>
   <div class="lock-deco ld-2"></div>
@@ -744,6 +868,9 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════
+     GALERÍA DESBLOQUEADA
+══════════════════════════════════════ -->
 <div id="gallery">
 
   <header class="gal-header">
@@ -752,12 +879,12 @@
   </header>
 
   <nav class="tab-nav" role="tablist">
-    <button class="tab-btn active" onclick="showTab('fotos',this)" role="tab"><span class="emoji">📸</span>Fotos</button>
-    <button class="tab-btn" onclick="showTab('videos',this)" role="tab"><span class="emoji">🎬</span>Videos</button>
-    <button class="tab-btn" onclick="showTab('cartas',this)" role="tab"><span class="emoji">💌</span>Cartas</button>
-    <button class="tab-btn" onclick="showTab('playlist',this)" role="tab"><span class="emoji">🎵</span>Playlist</button>
+    <button class="tab-btn active" onclick="showTab('fotos',this)"    role="tab"><span class="emoji">📸</span>Fotos</button>
+    <button class="tab-btn"        onclick="showTab('cartas',this)"   role="tab"><span class="emoji">💌</span>Cartas</button>
+    <button class="tab-btn"        onclick="showTab('playlist',this)" role="tab"><span class="emoji">🎵</span>Playlist</button>
   </nav>
 
+  <!-- ── PANEL: FOTOS ── -->
   <div class="tab-panel active" id="panel-fotos" role="tabpanel">
     <h2 class="panel-title">Nuestras <em>fotos</em></h2>
     <p class="panel-sub">Los momentos que merecen guardarse para siempre.</p>
@@ -768,35 +895,20 @@
     </div>
 
     <div class="photo-grid" id="photo-grid-container">
-      <p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px 0; font-style: italic;">Preparando los recuerdos...</p>
+      <p style="grid-column:1/-1; text-align:center; color:var(--muted); padding:40px 0; font-style:italic;">
+        Preparando los recuerdos...
+      </p>
     </div>
   </div>
 
-  <div class="tab-panel" id="panel-videos" role="tabpanel">
-    <h2 class="panel-title">Nuestros <em>videos</em></h2>
-    <p class="panel-sub">Los momentos en movimiento.</p>
-
-    <div class="video-grid">
-      <div class="video-card" onclick="alert('Agrega aquí la ruta de tu video.')">
-        <div class="video-thumb">
-          <span style="font-size:40px">✈️</span>
-          <div class="play-btn">▶</div>
-        </div>
-        <div class="video-info">
-          <p class="video-title">Nuestro primer viaje</p>
-          <p class="video-meta">2:34 · Diciembre 2021</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <!-- ── PANEL: CARTAS ── -->
   <div class="tab-panel" id="panel-cartas" role="tabpanel">
     <h2 class="panel-title">Nuestras <em>cartas</em></h2>
     <p class="panel-sub">Las palabras que valen más que cualquier foto.</p>
 
     <div class="letters-list">
       <article class="letter-card">
-        <p class="letter-from">De ti para mí <span class="letter-date">· Enero 2020</span></p>
+        <p class="letter-from">De ti para mí <span class="letter-date">· Enero 2021</span></p>
         <p class="letter-body">
           "Desde el primer día supe que había algo especial en la forma en que me mirabas..."
         </p>
@@ -804,32 +916,58 @@
     </div>
   </div>
 
+  <!-- ── PANEL: PLAYLIST YOUTUBE ── -->
   <div class="tab-panel" id="panel-playlist" role="tabpanel">
     <h2 class="panel-title">Nuestra <em>playlist</em></h2>
     <p class="panel-sub">Las canciones que cuentan lo que las palabras no alcanzan.</p>
 
-    <div class="playlist-wrap">
-      <div class="playlist-header">
-        <div class="playlist-cover">🎵</div>
-        <div>
-          <p class="playlist-name">Las canciones de nosotros</p>
-          <p class="playlist-count">Para siempre</p>
-        </div>
-      </div>
-      <div class="playlist-items">
-        <div class="song-row">
-          <span class="song-num">1</span>
-          <span class="song-play-ico">▶</span>
-          <div class="song-disc">🎸</div>
-          <div class="song-info">
-            <p class="song-title">Nuestra canción</p>
-            <p class="song-artist">Artista favorito</p>
-          </div>
-          <span class="song-dur">3:45</span>
-        </div>
-      </div>
+    <!-- Instrucciones -->
+    <p class="yt-hint">
+      Pega el <strong>ID de tu lista de reproducción de YouTube</strong> y haz clic en Cargar.<br>
+      Ejemplo: si la URL es <code>youtube.com/playlist?list=PLxxxxxxx</code>, el ID es <code>PLxxxxxxx</code>
+    </p>
+
+    <!-- Caja de configuración -->
+    <div class="yt-config-box">
+      <label for="yt-id-input">🎵 ID de playlist:</label>
+      <input
+        id="yt-id-input"
+        class="yt-input"
+        type="text"
+        placeholder="Ej: PLxxxxxxxxxxxxxxx"
+        onkeydown="if(event.key==='Enter') cargarPlaylist()"
+      >
+      <button class="yt-load-btn" onclick="cargarPlaylist()">Cargar playlist</button>
     </div>
 
+    <!-- Reproductor + lista lateral -->
+    <div class="yt-player-wrap" id="yt-player-wrap">
+
+      <!-- Iframe del reproductor -->
+      <div class="yt-embed-area" id="yt-embed-area">
+        <div class="yt-placeholder" id="yt-placeholder">
+          <span class="yt-icon">▶️</span>
+          <span>Ingresa el ID de tu playlist<br>para empezar a escuchar</span>
+        </div>
+      </div>
+
+      <!-- Panel lateral: lista de videos -->
+      <div class="yt-sidebar">
+        <div class="yt-sidebar-header">
+          <div class="yt-sidebar-icon">🎵</div>
+          <div>
+            <p class="yt-sidebar-title" id="yt-pl-name">Lista de reproducción</p>
+            <p class="yt-sidebar-sub"  id="yt-pl-count">—</p>
+          </div>
+        </div>
+        <div class="yt-track-list" id="yt-track-list">
+          <p class="yt-list-msg">Carga una playlist para ver las canciones aquí.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Mensaje final -->
     <div class="final-section">
       <div class="final-divider"></div>
       <span class="final-hearts">♥</span>
@@ -844,10 +982,13 @@
 
 </div>
 
+<!-- ══════════════════════════════════════
+     LIGHTBOX
+══════════════════════════════════════ -->
 <div class="lightbox" id="lightbox">
   <span class="lb-close" onclick="cerrarLightbox()">×</span>
-  <span class="lb-arrow lb-arrow-left" onclick="cambiarFoto(-1, event)">‹</span>
-  <img class="lb-img" id="lb-img" src="" alt="" onclick="event.stopPropagation()">
+  <span class="lb-arrow lb-arrow-left"  onclick="cambiarFoto(-1, event)">‹</span>
+  <img  class="lb-img" id="lb-img" src="" alt="" onclick="event.stopPropagation()">
   <span class="lb-arrow lb-arrow-right" onclick="cambiarFoto(1, event)">›</span>
 </div>
 
@@ -855,61 +996,58 @@
   // ══════════════════════════════════════
   // 1. CONFIGURACIÓN DE GITHUB (¡CÁMBIALO AQUÍ!)
   // ══════════════════════════════════════
-  const GITHUB_USER = 'DaewiLF'; // Escribe tu usuario de GitHub aquí
-  const GITHUB_REPO = 'aniversario'; // Escribe el nombre de tu repositorio aquí
-  const CARPETA_FOTOS = 'fotos'; // Nombre de la carpeta donde subirás las 70 imágenes
+  const GITHUB_USER   = 'DaewiLF';    // Tu usuario de GitHub
+  const GITHUB_REPO   = 'aniversario'; // Nombre del repositorio
+  const CARPETA_FOTOS = 'fotos';       // Carpeta donde están las imágenes
 
-  let BASE_DE_FOTOS = [];
+  let BASE_DE_FOTOS          = [];
   let fotosFiltradasActuales = [];
-  let fotoActualIndex = 0;
+  let fotoActualIndex        = 0;
 
   // ══════════════════════════════════════
-  // 2. FUNCIÓN DE CARGA INTELIGENTE (GITHUB API + CACHÉ)
+  // 2. CARGA DE FOTOS (GITHUB API + CACHÉ)
   // ══════════════════════════════════════
   const photoGridContainer = document.getElementById('photo-grid-container');
 
   async function inicializarGaleria() {
-    const cacheKey = 'galeria_secreta_cache';
+    const cacheKey   = 'galeria_secreta_cache';
     const cachedData = localStorage.getItem(cacheKey);
 
     if (cachedData) {
-      // Si ya existen en caché, cargamos al instante
       BASE_DE_FOTOS = JSON.parse(cachedData);
       finalizarCarga();
     } else {
-      // Si no hay caché, consultamos la API de GitHub en tiempo de ejecución
       try {
-        const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_FOTOS}`;
+        const url      = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_FOTOS}`;
         const response = await fetch(url);
-        
-        if (!response.ok) throw new Error('No se pudo obtener la lista de archivos. Verifica usuario y repo.');
-        
-        const archivos = await response.json();
+
+        if (!response.ok) throw new Error('No se pudo obtener la lista de archivos.');
+
+        const archivos         = await response.json();
         const extensionesValidas = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 
         BASE_DE_FOTOS = archivos
           .filter(file => file.type === 'file' && extensionesValidas.some(ext => file.name.toLowerCase().endsWith(ext)))
           .map(file => {
-            // Limpia "foto_de_viaje.jpg" a "Foto de viaje"
             const nombreLimpio = file.name
               .substring(0, file.name.lastIndexOf('.'))
               .replace(/[-_]/g, ' ');
-
             return {
-              src: file.path, 
-              titulo: nombreLimpio.charAt(0).toUpperCase() + nombreLimpio.slice(1),
-              fecha: "♥",
-              categoria: "random" 
+              src:      file.path,
+              titulo:   nombreLimpio.charAt(0).toUpperCase() + nombreLimpio.slice(1),
+              fecha:    '♥',
+              categoria:'random'
             };
           });
 
-        // Guardamos en caché
         localStorage.setItem(cacheKey, JSON.stringify(BASE_DE_FOTOS));
         finalizarCarga();
 
       } catch (error) {
-        console.error("Error mapeando la carpeta de fotos:", error);
-        photoGridContainer.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px 0;">No se pudieron cargar las fotos. Asegúrate de que el repositorio esté en GitHub y los nombres sean correctos.</p>`;
+        console.error('Error mapeando la carpeta de fotos:', error);
+        photoGridContainer.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--muted); padding:40px 0;">
+          No se pudieron cargar las fotos. Verifica usuario y repositorio.
+        </p>`;
       }
     }
   }
@@ -919,43 +1057,37 @@
     renderizarFotos(fotosFiltradasActuales);
   }
 
-  function renderizarFotos(arregloDeFotos) {
+  function renderizarFotos(arr) {
     photoGridContainer.innerHTML = '';
-    
-    if(arregloDeFotos.length === 0) {
-      photoGridContainer.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px 0; font-weight: 300;">Aún no hay fotos cargadas ♥</p>`;
+    if (arr.length === 0) {
+      photoGridContainer.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--muted); padding:40px 0; font-weight:300;">Aún no hay fotos cargadas ♥</p>`;
       return;
     }
-
-    arregloDeFotos.forEach((foto, index) => {
-      const htmlWrap = `
+    arr.forEach((foto, index) => {
+      photoGridContainer.insertAdjacentHTML('beforeend', `
         <div class="photo-wrap">
           <div class="photo-cell" onclick="abrirLightbox(${index})">
             <img src="${foto.src}" alt="${foto.titulo}" loading="lazy">
           </div>
-          <p class="photo-caption">${foto.titulo} <br><span style="font-size:10px; opacity:0.7">${foto.fecha}</span></p>
+          <p class="photo-caption">${foto.titulo}<br><span style="font-size:10px;opacity:.7">${foto.fecha}</span></p>
         </div>
-      `;
-      photoGridContainer.insertAdjacentHTML('beforeend', htmlWrap);
+      `);
     });
   }
 
-  function filtrarCategoria(categoria, botonElemento) {
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    botonElemento.classList.add('active');
-
-    if (categoria === 'todas') {
-      fotosFiltradasActuales = [...BASE_DE_FOTOS];
-    } else {
-      fotosFiltradasActuales = BASE_DE_FOTOS.filter(f => f.categoria === categoria);
-    }
+  function filtrarCategoria(categoria, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    fotosFiltradasActuales = categoria === 'todas'
+      ? [...BASE_DE_FOTOS]
+      : BASE_DE_FOTOS.filter(f => f.categoria === categoria);
     renderizarFotos(fotosFiltradasActuales);
   }
 
   // ══════════════════════════════════════
-  // 3. LIGHTBOX CON NAVEGACIÓN
+  // 3. LIGHTBOX
   // ══════════════════════════════════════
-  const lightbox = document.getElementById('lightbox');
+  const lightbox    = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lb-img');
 
   function abrirLightbox(index) {
@@ -964,21 +1096,11 @@
     lightbox.classList.add('open');
   }
 
-  function cerrarLightbox() {
-    lightbox.classList.remove('open');
-  }
+  function cerrarLightbox() { lightbox.classList.remove('open'); }
 
-  function cambiarFoto(direccion, event) {
+  function cambiarFoto(dir, event) {
     if (event) event.stopPropagation();
-    
-    fotoActualIndex += direccion;
-    
-    if (fotoActualIndex >= fotosFiltradasActuales.length) {
-      fotoActualIndex = 0;
-    } else if (fotoActualIndex < 0) {
-      fotoActualIndex = fotosFiltradasActuales.length - 1;
-    }
-    
+    fotoActualIndex = (fotoActualIndex + dir + fotosFiltradasActuales.length) % fotosFiltradasActuales.length;
     lightboxImg.src = fotosFiltradasActuales[fotoActualIndex].src;
   }
 
@@ -986,16 +1108,16 @@
 
   document.addEventListener('keydown', e => {
     if (lightbox.classList.contains('open')) {
-      if (e.key === 'Escape') cerrarLightbox();
-      if (e.key === 'ArrowRight') cambiarFoto(1);
-      if (e.key === 'ArrowLeft') cambiarFoto(-1);
+      if (e.key === 'Escape')      cerrarLightbox();
+      if (e.key === 'ArrowRight')  cambiarFoto(1);
+      if (e.key === 'ArrowLeft')   cambiarFoto(-1);
     }
   });
 
   // ══════════════════════════════════════
-  // 4. LÓGICA DE ACCESO DEL PIN
+  // 4. PIN / ACCESO
   // ══════════════════════════════════════
-  const SECRET = '09062022';
+  const SECRET = '09062021'; // ← año cambiado a 2021
   let pin = '';
 
   function key(k) {
@@ -1005,21 +1127,11 @@
     if (pin.length === 8) setTimeout(tryUnlock, 200);
   }
 
-  function del() {
-    pin = pin.slice(0, -1);
-    updateDots();
-    clearErr();
-  }
+  function del() { pin = pin.slice(0, -1); updateDots(); clearErr(); }
 
-  function clearPin() {
-    pin = '';
-    updateDots();
-    clearErr();
-  }
+  function clearPin() { pin = ''; updateDots(); clearErr(); }
 
-  function clearErr() {
-    document.getElementById('err-msg').textContent = '';
-  }
+  function clearErr() { document.getElementById('err-msg').textContent = ''; }
 
   function updateDots() {
     for (let i = 0; i < 8; i++) {
@@ -1032,21 +1144,14 @@
   function tryUnlock() {
     if (pin === SECRET) {
       document.getElementById('lock-screen').style.display = 'none';
-      const gal = document.getElementById('gallery');
-      gal.classList.add('open');
-      
-      // Llamamos a la API de GitHub SOLAMENTE cuando el PIN es correcto
-      if(BASE_DE_FOTOS.length === 0) {
-        inicializarGaleria();
-      }
+      document.getElementById('gallery').classList.add('open');
+      if (BASE_DE_FOTOS.length === 0) inicializarGaleria();
     } else {
       document.getElementById('err-msg').textContent = 'Fecha incorrecta. Inténtalo de nuevo.';
       document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('error'));
       pin = '';
       setTimeout(() => {
-        document.querySelectorAll('.pin-dot').forEach(d => {
-          d.classList.remove('error', 'on');
-        });
+        document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error', 'on'));
       }, 600);
     }
   }
@@ -1059,29 +1164,141 @@
     clearErr();
   }
 
-  // Si presionas el botón de limpiar (⟳) doble vez cuando está vacío, limpiará la caché de imágenes por si subiste fotos nuevas
+  // Doble clic en ⟳ para limpiar caché de fotos
   document.querySelector('.util[aria-label="Limpiar"]').addEventListener('dblclick', () => {
     localStorage.removeItem('galeria_secreta_cache');
-    alert("Caché de fotos limpiada. Se volverán a descargar de GitHub al entrar.");
+    alert('Caché de fotos limpiada. Se volverán a descargar de GitHub al entrar.');
   });
 
   document.addEventListener('keydown', e => {
     const lockVisible = document.getElementById('lock-screen').style.display !== 'none';
     if (lockVisible) {
       if (e.key >= '0' && e.key <= '9') key(e.key);
-      else if (e.key === 'Backspace') del();
-      else if (e.key === 'Escape') clearPin();
+      else if (e.key === 'Backspace')   del();
+      else if (e.key === 'Escape')      clearPin();
     }
   });
 
   // ══════════════════════════════════════
-  // 5. CAMBIO DE PESTAÑAS (TABS)
+  // 5. TABS
   // ══════════════════════════════════════
   function showTab(id, btn) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('panel-' + id).classList.add('active');
     btn.classList.add('active');
+  }
+
+  // ══════════════════════════════════════
+  // 6. PLAYLIST YOUTUBE
+  // ══════════════════════════════════════
+
+  // API Key pública (solo lectura de metadatos de playlist pública)
+  // Si no tienes API key, el iframe igual reproducirá; solo la lista lateral
+  // requiere la API. Deja vacío para usar solo el reproductor embed.
+  const YT_API_KEY = ''; // ← Opcional: pega tu API Key de YouTube Data API v3
+
+  let ytPlaylistId    = '';
+  let ytVideoIndex    = 0;
+  let ytVideos        = [];
+
+  function cargarPlaylist() {
+    const input = document.getElementById('yt-id-input').value.trim();
+    if (!input) return;
+
+    // Limpiar posibles URLs completas y extraer solo el ID
+    const match = input.match(/[?&]list=([^&]+)/) || input.match(/^(PL[a-zA-Z0-9_-]+)$/);
+    ytPlaylistId = match ? match[1] : input;
+
+    ytVideoIndex = 0;
+    ytVideos     = [];
+
+    // Cargar el iframe apuntando al primer video de la playlist
+    montarIframe(ytPlaylistId, 0);
+
+    // Intentar cargar la lista lateral si hay API key
+    if (YT_API_KEY) {
+      cargarListaConAPI(ytPlaylistId);
+    } else {
+      document.getElementById('yt-track-list').innerHTML =
+        `<p class="yt-list-msg">▶ La playlist está cargada en el reproductor.<br><br>
+        Para ver la lista de canciones aquí, agrega tu <strong>YT_API_KEY</strong> en el código.</p>`;
+      document.getElementById('yt-pl-name').textContent  = 'Playlist cargada';
+      document.getElementById('yt-pl-count').textContent = 'reproduciendo…';
+    }
+  }
+
+  function montarIframe(playlistId, startIndex) {
+    const embedArea = document.getElementById('yt-embed-area');
+    embedArea.innerHTML = `
+      <iframe
+        id="yt-iframe"
+        src="https://www.youtube.com/embed/videoseries?list=${playlistId}&index=${startIndex}&autoplay=1&rel=0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    `;
+  }
+
+  async function cargarListaConAPI(playlistId) {
+    document.getElementById('yt-track-list').innerHTML =
+      `<p class="yt-list-msg">Cargando canciones…</p>`;
+
+    try {
+      let url       = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YT_API_KEY}`;
+      let allItems  = [];
+      let nextPage  = null;
+
+      do {
+        const res  = await fetch(nextPage ? url + '&pageToken=' + nextPage : url);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+        allItems = allItems.concat(data.items);
+        nextPage = data.nextPageToken || null;
+      } while (nextPage);
+
+      ytVideos = allItems.map(item => ({
+        id:      item.snippet.resourceId.videoId,
+        title:   item.snippet.title,
+        channel: item.snippet.videoOwnerChannelTitle || '',
+        thumb:   item.snippet.thumbnails?.default?.url || ''
+      }));
+
+      document.getElementById('yt-pl-name').textContent  = 'Lista de reproducción';
+      document.getElementById('yt-pl-count').textContent = `${ytVideos.length} canciones`;
+
+      renderizarLista();
+
+    } catch (err) {
+      document.getElementById('yt-track-list').innerHTML =
+        `<p class="yt-list-msg">No se pudo cargar la lista.<br><small>${err.message}</small></p>`;
+    }
+  }
+
+  function renderizarLista() {
+    const container = document.getElementById('yt-track-list');
+    container.innerHTML = '';
+    ytVideos.forEach((v, i) => {
+      const div = document.createElement('div');
+      div.className = 'yt-track' + (i === ytVideoIndex ? ' playing' : '');
+      div.dataset.index = i;
+      div.innerHTML = `
+        <span class="yt-track-num">${i === ytVideoIndex ? '♪' : i + 1}</span>
+        ${v.thumb ? `<img class="yt-track-thumb" src="${v.thumb}" alt="">` : '<div class="yt-track-thumb"></div>'}
+        <div class="yt-track-info">
+          <p class="yt-track-name">${v.title}</p>
+          <p class="yt-track-ch">${v.channel}</p>
+        </div>
+      `;
+      div.addEventListener('click', () => reproducirVideo(i));
+      container.appendChild(div);
+    });
+  }
+
+  function reproducirVideo(index) {
+    ytVideoIndex = index;
+    montarIframe(ytPlaylistId, index);
+    if (ytVideos.length > 0) renderizarLista();
   }
 </script>
 </body>
